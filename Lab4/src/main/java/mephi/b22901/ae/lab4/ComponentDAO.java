@@ -10,7 +10,7 @@ public class ComponentDAO implements DAO<Component> {
 
     @Override
 public void create(Component component) {
-    String sql = "INSERT INTO Component(component_type, component_name) VALUES (?, ?)";
+    String sql = "INSERT INTO component(component_type, component_name) VALUES (?, ?)";
 
     try (Connection conn = DBConnection.getConnection();
          PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -27,7 +27,7 @@ public void create(Component component) {
 
     @Override
     public Component getById(int id) {
-        String sql = "SELECT * FROM Component WHERE id_component = ?";
+        String sql = "SELECT * FROM component WHERE id_component = ?";
         Component component = null;
 
         try (Connection conn = DBConnection.getConnection();
@@ -52,7 +52,7 @@ public void create(Component component) {
 
     @Override
     public List<Component> getAll() {
-        String sql = "SELECT * FROM Component";
+        String sql = "SELECT * FROM component";
         List<Component> components = new ArrayList<>();
 
         try (Connection conn = DBConnection.getConnection();
@@ -76,7 +76,7 @@ public void create(Component component) {
 
     @Override
     public void update(Component component) {
-        String sql = "UPDATE Component SET component_type = ?, component_name = ? WHERE id_component = ?";
+        String sql = "UPDATE component SET component_type = ?, component_name = ? WHERE id_component = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -94,7 +94,7 @@ public void create(Component component) {
 
     @Override
     public void delete(int id) {
-        String sql = "DELETE FROM Component WHERE id_component = ?";
+        String sql = "DELETE FROM component WHERE id_component = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -109,7 +109,7 @@ public void create(Component component) {
 
 
     public Component getByTypeAndName(String type, String name) {
-        String sql = "SELECT * FROM Component WHERE component_type = ? AND component_name = ?";
+        String sql = "SELECT * FROM component WHERE component_type = ? AND component_name = ?";
         Component component = null;
 
         try (Connection conn = DBConnection.getConnection();

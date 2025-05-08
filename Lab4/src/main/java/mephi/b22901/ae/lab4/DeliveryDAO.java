@@ -11,13 +11,12 @@ public class DeliveryDAO implements DAO<Delivery> {
 
     @Override
     public void create(Delivery delivery) {
-        String sql = "INSERT INTO Delivery(id_delivery, delivery_date) VALUES (?, ?)";
+        String sql = "INSERT INTO Delivery(delivery_date) VALUES (?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, delivery.getIdDelivery());
-            pstmt.setDate(2, Date.valueOf(delivery.getDeliveryDate()));
+            pstmt.setDate(1, Date.valueOf(delivery.getDeliveryDate()));
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
