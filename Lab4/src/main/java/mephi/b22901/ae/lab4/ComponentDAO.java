@@ -9,20 +9,28 @@ public class ComponentDAO implements DAO<Component> {
 
 
     @Override
-public void create(Component component) {
-    String sql = "INSERT INTO component(component_type, component_name) VALUES (?, ?)";
+    public void create(Component component) {
+        String sql = "INSERT INTO Component(component_type, component_name) VALUES (?, ?)";
 
-    try (Connection conn = DBConnection.getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-        pstmt.setString(1, component.getComponentType());
-        pstmt.setString(2, component.getComponentName());
-        pstmt.executeUpdate();
+            pstmt.setString(1, component.getComponentType());
+            pstmt.setString(2, component.getComponentName());
+            pstmt.executeUpdate();
 
-    } catch (SQLException e) {
-        System.out.println("Ошибка при добавлении компонента: " + e.getMessage());
+            // Получаем сгенерированный id_component
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int generatedId = generatedKeys.getInt(1);
+                    component.setIdComponent(generatedId); // Устанавливаем реальный ID из БД
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Ошибка при добавлении компонента: " + e.getMessage());
+        }
     }
-}
 
 
     @Override

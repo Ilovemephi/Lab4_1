@@ -9,20 +9,26 @@ import java.util.List;
 public class DeliveryDAO implements DAO<Delivery> {
 
 
+    
     @Override
-    public void create(Delivery delivery) {
-        String sql = "INSERT INTO Delivery(delivery_date) VALUES (?)";
+        public void create(Delivery delivery) {
+            String sql = "INSERT INTO Delivery(delivery_date) VALUES (?) RETURNING id_delivery";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setDate(1, Date.valueOf(delivery.getDeliveryDate()));
-            pstmt.executeUpdate();
+                pstmt.setDate(1, Date.valueOf(delivery.getDeliveryDate()));
+                ResultSet rs = pstmt.executeQuery();
 
-        } catch (SQLException e) {
-            System.out.println("Ошибка при добавлении поставки: " + e.getMessage());
+                if (rs.next()) {
+                    int generatedId = rs.getInt("id_delivery");
+                    delivery.setIdDelivery(generatedId);
+                }
+
+            } catch (SQLException e) {
+                System.out.println("Ошибка при добавлении поставки: " + e.getMessage());
+            }
         }
-    }
 
 
     @Override

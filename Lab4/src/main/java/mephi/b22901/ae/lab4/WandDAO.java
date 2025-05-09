@@ -13,18 +13,23 @@ public class WandDAO implements DAO<Wand> {
 
     @Override
     public void create(Wand wand) {
-        String sql = "INSERT INTO Wand(id_wand, owner_name, id_wood, id_core, status) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Wand(owner_name, id_wood, id_core, status) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, wand.getIdWand());
-            pstmt.setString(2, wand.getOwnerName());
-            pstmt.setInt(3, wand.getWood().getIdComponent());
-            pstmt.setInt(4, wand.getCore().getIdComponent());
-            pstmt.setString(5, wand.getStatus());
-
+            pstmt.setString(1, wand.getOwnerName());
+            pstmt.setInt(2, wand.getWood().getIdComponent());
+            pstmt.setInt(3, wand.getCore().getIdComponent());
+            pstmt.setString(4, wand.getStatus());
             pstmt.executeUpdate();
+
+
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    wand.setIdWand(rs.getInt(1)); 
+                }
+            }
 
         } catch (SQLException e) {
             System.out.println("Ошибка при добавлении палочки: " + e.getMessage());
