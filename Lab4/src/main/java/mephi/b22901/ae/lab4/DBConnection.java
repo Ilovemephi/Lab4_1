@@ -8,8 +8,8 @@ import java.sql.SQLException;
 
 
 public class DBConnection {
-    private static final String URL = "jdbc:postgresql://localhost:5432/MagicShop";
-    private static final String USER = "postgres";
+    private static final String URL = "jdbc:postgresql://aws-0-eu-north-1.pooler.supabase.com:5432/postgres";
+    private static final String USER = "postgres.aghhopisfabqhqjpadgp";
     private static final String PASSWORD = "Brateevo11b";
 
 

@@ -129,7 +129,6 @@ public class DeliveryForm extends JFrame {
         topPanel.add(amountLabel);
         topPanel.add(amountField);
         topPanel.add(addComponentButton);
-
         add(topPanel);
         add(new JLabel("Добавленные компоненты:"));
         add(scrollPane);
