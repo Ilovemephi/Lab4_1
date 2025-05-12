@@ -20,13 +20,17 @@ public class MainApp extends JFrame {
         JButton wandSellButton = new JButton("Продать палочку");
         JButton warehouseButton = new JButton("Посмотреть состояние склада");
         JButton clearDataButton = new JButton("Полная очистка системы");
+        JButton viewSoldButton = new JButton("Посмотреть проданные палочки");
 
         deliveryButton.addActionListener(e -> new DeliveryForm().setVisible(true));
         wandCreateButton.addActionListener(e -> new CreateWandForm().setVisible(true));
         wandSellButton.addActionListener(e -> new SellWandForm().setVisible(true));
         warehouseButton.addActionListener(e -> new WarehouseView().setVisible(true));
         clearDataButton.addActionListener(e -> confirmAndClearData());
-
+        viewSoldButton.addActionListener(e -> new SoldWandForm().setVisible(true));
+        
+        
+        panel.add(viewSoldButton);
         panel.add(deliveryButton);
         panel.add(wandCreateButton);
         panel.add(wandSellButton);
