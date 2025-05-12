@@ -5,76 +5,96 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DeliveryForm extends JFrame {
-    private JTextField dateField;
-    private JTextField componentTypeField;
+    private JComboBox<String> typeComboBox;
     private JTextField componentNameField;
     private JTextField amountField;
+    private JTextField dateField;
+    private Map<String, String> typeMapping;
 
     public DeliveryForm() {
+        typeMapping = new HashMap<>();
+        typeMapping.put("древесина", "wood");
+        typeMapping.put("сердцевина", "core");
+
         setTitle("Добавление поставки");
-        setSize(400, 300);
+        setSize(400, 350);
         setLocationRelativeTo(null);
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
-        JLabel dateLabel = new JLabel("Дата поставки (YYYY-MM-DD):");
-        dateField = new JTextField(20);
-
-        JLabel typeLabel = new JLabel("Тип компонента (wood/core):");
-        componentTypeField = new JTextField(20);
+        JLabel typeLabel = new JLabel("Выберите тип компонента:");
+        String[] displayTypes = {"древесина", "сердцевина"};
+        typeComboBox = new JComboBox<>(displayTypes);
 
         JLabel nameLabel = new JLabel("Название компонента:");
         componentNameField = new JTextField(20);
+
+        JLabel dateLabel = new JLabel("Дата поставки (YYYY-MM-DD):");
+        dateField = new JTextField(LocalDate.now().toString(), 20);
 
         JLabel amountLabel = new JLabel("Количество:");
         amountField = new JTextField(20);
 
         JButton submitButton = new JButton("Добавить поставку");
 
-        submitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    ComponentDAO componentDAO = new ComponentDAO();
-                    DeliveryDAO deliveryDAO = new DeliveryDAO();
-                    DeliveryDetailsDAO detailsDAO = new DeliveryDetailsDAO();
-                    WarehouseService warehouseService = new WarehouseService();
+        submitButton.addActionListener(e -> {
+            try {
+                ComponentDAO componentDAO = new ComponentDAO();
+                DeliveryDAO deliveryDAO = new DeliveryDAO();
+                DeliveryDetailsDAO detailsDAO = new DeliveryDetailsDAO();
+                WarehouseService warehouseService = new WarehouseService();
 
-               
-                    String type = componentTypeField.getText();
-                    String name = componentNameField.getText();
-                    Component component = new Component(type, name);
-                    componentDAO.create(component); 
+             
+                String displayType = (String) typeComboBox.getSelectedItem(); 
+                String internalType = typeMapping.get(displayType); 
+
+                String name = componentNameField.getText().trim();
+                int amount = Integer.parseInt(amountField.getText().trim());
+                LocalDate date = LocalDate.parse(dateField.getText());
+
+  
+                Component component = componentDAO.getByTypeAndName(internalType, name);
+                if (component == null) {
+                    component = new Component(internalType, name);
+                    componentDAO.create(component);
+                }
+
+
+                Delivery delivery = new Delivery(0, date);
+                deliveryDAO.create(delivery); 
 
       
-                    LocalDate date = LocalDate.parse(dateField.getText());
-                    Delivery delivery = new Delivery(0, date); 
-                    deliveryDAO.create(delivery); // Здесь должен быть метод с RETURNING id_delivery
+                DeliveryDetails detail = new DeliveryDetails(
+                        0,
+                        delivery,
+                        component.getIdComponent(),
+                        component.getComponentType(),
+                        component.getComponentName(),
+                        amount
+                );
+                detailsDAO.create(detail);
 
-        
-                    DeliveryDetails detail = new DeliveryDetails(
-                            0, delivery, component.getIdComponent(), type, name, Integer.parseInt(amountField.getText())
-                    );
-                    detailsDAO.create(detail);
 
-         
-                    warehouseService.increaseStock(component, Integer.parseInt(amountField.getText()));
+                warehouseService.increaseStock(component, amount);
 
-                    JOptionPane.showMessageDialog(DeliveryForm.this, "Поставка добавлена.");
+                JOptionPane.showMessageDialog(DeliveryForm.this, "Поставка успешно добавлена.");
+                dispose(); 
 
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(DeliveryForm.this, "Ошибка: " + ex.getMessage());
-                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(DeliveryForm.this, "Ошибка при добавлении поставки:\n" + ex.getMessage());
             }
         });
 
-        add(dateLabel);
-        add(dateField);
+
         add(typeLabel);
-        add(componentTypeField);
+        add(typeComboBox);
         add(nameLabel);
         add(componentNameField);
+        add(dateLabel);
+        add(dateField);
         add(amountLabel);
         add(amountField);
         add(submitButton);
